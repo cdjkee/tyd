@@ -1,3 +1,5 @@
 config.py
 __pycache__/
 cipher.py
+.dockerignore
+Dockerfile
