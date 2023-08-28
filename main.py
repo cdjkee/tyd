@@ -42,16 +42,16 @@ from telegram.ext import (
 from telegram.constants import ParseMode
 from pytube import YouTube
 from pytube.cli import on_progress
-import threading 
-# From config: 
+from typing import Final
+import threading
+import re
+import os
+
+# From ENV 
 # TOKEN - TG bot token
-# yt_link_reg is regexp to detect valid link in a message
-# yt_link_reg_clean is regexp to get a clean link from the message
-# soid is TG id of significant other to send special messages to
-
-
-from config import TOKEN, yt_link_reg, yt_link_reg_clean, soid
-
+# soid is a list of TG ids separated with commas to send special messages to
+TOKEN = os.environ.get('TOKEN')
+soid = os.environ.get('SOID')
 
 # Enable logging
 logging.basicConfig(
@@ -62,8 +62,10 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
-SENDING_LINK, W84_CHOICE = range(2)
-
+# yt_link_reg is regexp to detect valid link in a message
+# yt_link_reg_clean is regexp to get a clean link from the message
+yt_link_reg: Final = re.compile(r"https://(www\.youtube\.com\/watch\?v\=|youtu\.be/|youtube\.com/shorts/|www\.youtube\.com/shorts/|www\.youtube\.com/live/).*")
+yt_link_reg_clean: Final = re.compile(r"https://(www\.youtube\.com\/watch\?v\=|youtu\.be/|youtube\.com/shorts/|www\.youtube\.com/shorts/|www\.youtube\.com/live/).*(\?|$|\s)")
 reply_keyboard = [["Download", "Cancel"]]
 links_kbd=[]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True, resize_keyboard=True)
@@ -158,14 +160,14 @@ async def check_status(context: ContextTypes.DEFAULT_TYPE) -> int:
 #text input handler
 async def current_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Just send me a link.',reply_markup=ReplyKeyboardRemove())
-    if update.effective_user.id == soid:
+    if str(update.effective_user.id) in soid:
         await update.message.reply_text('\U0001F618')
 
 #processing the link provided by user, if OK, show keyboard and call process_choice function
 #SENDING LINK
 async def process_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text('It looks like a link. Wait until I check it thoroughly, generate downloading links and send them to you.', reply_markup=ReplyKeyboardRemove())
-    if update.effective_user.id == soid:
+    if str(update.effective_user.id) in soid:
         await update.message.reply_text('Сделаю ссылочки для любимой \U00002764')
     try:
         link = re.search(yt_link_reg_clean, update.message.text).group()
