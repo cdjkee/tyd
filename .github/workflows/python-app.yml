@@ -14,20 +14,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Checkout code
       uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.11'
+    - name: Get the latest tags
+      id: gettag
+      run:
+        echo "::set-output name=tag::$(git describe --tags --abbrev=0 || echo 'v0.0.0')"
+
+    # - name: Build and push
+    #   uses: docker/build-push-action@v5
+    #   with:
+    #     push: true
+    #     tags: "${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{env.PACKAGE_VERSION}}"
 
     - name: Build Docker image
       run: |
-        docker build -t {{ secrets.DOCKER_USERNAME }}/{{ env.PACKAGE_NAME }}:{{env.PACKAGE_VERSION}} .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{env.PACKAGE_VERSION}} .
     - name: Push Docker image
       run: |
-        docker push {{ secrets.DOCKER_USERNAME }}/{{ env.PACKAGE_NAME }}:{{env.PACKAGE_VERSION}}
+        docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{env.PACKAGE_VERSION}}
     
     - name: Deploy to Remote Server
       uses: appleboy/ssh-action@master
@@ -38,5 +60,5 @@ jobs:
         script: |
           docker stop tyd || true
           docker rm tyd || true
-          docker pull {{ secrets.DOCKER_USERNAME }}/{{ env.PACKAGE_NAME }}:{{env.PACKAGE_VERSION}}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{env.PACKAGE_VERSION}}
           docker run -d --rm -e TOKEN="${{ secrets.TYD_TOKEN }}" -e SOID=${{ secrets.TYD_SOID }} --name {{ env.PACKAGE_NAME }} {{ secrets.DOCKER_USERNAME }}/{{ env.PACKAGE_NAME }}
