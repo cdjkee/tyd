@@ -24,7 +24,10 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t myapp .
+        docker build -t {{ secrets.DOCKER_USERNAME }}/{{ env.PACKAGE_NAME }}:{{env.PACKAGE_VERSION}} .
+    - name: Push Docker image
+      run: |
+        docker push {{ secrets.DOCKER_USERNAME }}/{{ env.PACKAGE_NAME }}:{{env.PACKAGE_VERSION}}
     
     - name: Deploy to Remote Server
       uses: appleboy/ssh-action@master
