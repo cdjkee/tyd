@@ -35,8 +35,10 @@ jobs:
         python-version: '3.11'
     - name: Get the latest tags
       id: gettag
-      run:
-        echo "::set-output name=tag::$(git describe --tags --abbrev=0 || echo 'v0.0.0')"
+      run: |
+        # echo "::set-output name=tag::$(git describe --tags --abbrev=0 || echo 'v0.0.0')"
+        echo "{tag}={$(git describe --tags --abbrev=0 || echo 'v0.0.0')}" >> $GITHUB_OUTPUT
+        echo "$ got version {{ steps.gettag.outputs.tag }}""
 
     # - name: Build and push
     #   uses: docker/build-push-action@v5
