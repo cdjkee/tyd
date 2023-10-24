@@ -36,10 +36,10 @@ jobs:
     - name: Get the latest tags
       id: gettag
       run: |
-        echo "{tag}={${{github.ref_name}}}
+        echo "{tag}={${{github.ref_name}}}"
         
     #" >> $GITHUB_OUTPUT
-    #    echo "$ got version {{ steps.gettag.outputs.tag }}""
+    #    echo "$ got version {{ steps.gettag.outputs.tag }}"
 
     # - name: Build and push
     #   uses: docker/build-push-action@v5
