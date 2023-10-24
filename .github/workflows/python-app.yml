@@ -2,7 +2,7 @@ name: Deploy to Remote Server
 
 env:
   PACKAGE_NAME : "tyd"
-  PACKAGE_VERSION : "1.22"
+  PACKAGE_VERSION : "1.28"
   
 on:
   push:
@@ -51,10 +51,10 @@ jobs:
     # echo "::set-output name=tag::$(git describe --tags --abbrev=0 || echo 'v0.0.0')"
     - name: Build Docker image
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{env.PACKAGE_VERSION}} .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{  github.ref_name }} .
     - name: Push Docker image
       run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{env.PACKAGE_VERSION}}
+        docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{  github.ref_name }}
     
     - name: Deploy to Remote Server
       uses: appleboy/ssh-action@master
@@ -64,5 +64,5 @@ jobs:
         key: ${{ secrets.FB_KEY }}
         script: |
           docker stop tyd || true
-          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{env.PACKAGE_VERSION}}
-          docker run -d --rm -e TOKEN="${{ secrets.TYD_TOKEN }}" -e SOID=${{ secrets.TYD_SOID }} --name ${{ env.PACKAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{env.PACKAGE_VERSION}}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{  github.ref_name }}
+          docker run -d --rm -e TOKEN="${{ secrets.TYD_TOKEN }}" -e SOID=${{ secrets.TYD_SOID }} --name ${{ env.PACKAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{  github.ref_name }}
