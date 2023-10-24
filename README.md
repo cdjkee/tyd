@@ -14,4 +14,4 @@ Uses
     pytube
 
 Runs
-    docker run -d --rm -e TOKEN="1234567890:TelegramToken" -e SOID=123123123 --name tyd cdoroff/tyd:1.2
+    docker run -d --rm -e TOKEN="1234567890:TelegramToken" -e SOID=123123123 --name tyd cdoroff/tyd:1.25
