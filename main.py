@@ -136,9 +136,6 @@ def generate_kbd(yt):
         audiorow.append(InlineKeyboardButton(text=f"{round(stream.filesize_mb)}MB", url=stream.url))
 
     result.append(audiorow)
-    # print (result)
-    # stream = yt.streams.get_audio_only()
-    # result.append([InlineKeyboardButton(text=f"Download {stream.abr} {round(stream.filesize_mb,1)}MB audio", url=stream.url)])
     print('KEYBOARD GENERATED')
     return result
 
