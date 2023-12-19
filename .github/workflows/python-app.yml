@@ -2,7 +2,7 @@ name: Deploy to Remote Server
 
 env:
   PACKAGE_NAME : "tyd"
-  PACKAGE_VERSION : "1.32"
+  PACKAGE_VERSION : "1.34"
   
 on:
   push:
@@ -63,6 +63,7 @@ jobs:
         username: ${{ secrets.FB_LOGIN }}
         key: ${{ secrets.FB_KEY }}
         script: |
-          docker stop tyd || true
+          docker stop ${{ env.PACKAGE_NAME }} || true
+          docker rm ${{ env.PACKAGE_NAME }}
           docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{  github.ref_name }}
           docker run -d -e TOKEN="${{ secrets.TYD_TOKEN }}" -e SOID=${{ secrets.TYD_SOID }} --restart=always --name ${{ env.PACKAGE_NAME }} ${{ secrets.DOCKER_USERNAME }}/${{ env.PACKAGE_NAME }}:${{  github.ref_name }}
