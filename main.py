@@ -41,8 +41,8 @@ from telegram.ext import (
     filters,
 )
 from telegram.constants import ParseMode
-from pytube import YouTube
-from pytube.cli import on_progress
+from pytubefix import YouTube
+from pytubefix.cli import on_progress
 from typing import Final
 import threading
 import re
